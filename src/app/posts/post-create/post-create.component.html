@@ -1,14 +1,9 @@
-<!--<h2>Post Create Component</h2>
-<textarea rows="6" [value]="'Click to add post'" #post></textarea>
-<input type="text" [(ngModel)]="displayPost">
-<hr>
-<button (click)="onAddPost(post)">Save Post</button>
-{{newPost}}-->
 <mat-card>
-  <mat-form-field class="example-full-width">
-    <textarea matInput placeholder="Ex. It makes me feel..."rows="6" #post></textarea>
+  <mat-form-field>
+    <input placeholder="Add Title" matInput type="text" [(ngModel)]="enteredTitle">
   </mat-form-field>
-  <button mat-raised-button color="primary" (click)="onAddPost(post)">Save Post</button>
+  <mat-form-field class="example-full-width">
+    <textarea matInput placeholder="Add Content" rows="6" [(ngModel)]="enteredContent"></textarea>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="onAddPost()">Save Post</button>
 </mat-card>
-
-{{newPost}}
