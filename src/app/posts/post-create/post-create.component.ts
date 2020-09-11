@@ -1,5 +1,5 @@
 import { Component,EventEmitter,Output } from '@angular/core';
-
+import {Post} from '../post.model';
 @Component({
   selector : 'app-post-create',
   templateUrl : './post-create.component.html',
@@ -9,13 +9,13 @@ import { Component,EventEmitter,Output } from '@angular/core';
 
 export class PostCreateComponent{
 
-  enteredTitle:String = '';
-  enteredContent:String = '';
+  enteredTitle:string = '';
+  enteredContent:string = '';
   @Output() createdPost = new EventEmitter();
 
   onAddPost(){
     console.log("In post added method PostAdded! Beg");
-    const post={
+    const post: Post={
       title:this.enteredTitle,
       content:this.enteredContent
     };
