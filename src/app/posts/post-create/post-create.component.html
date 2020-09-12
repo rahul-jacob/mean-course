@@ -1,9 +1,37 @@
 <mat-card>
-  <mat-form-field>
-    <input placeholder="Add Title" matInput type="text" [(ngModel)]="enteredTitle">
-  </mat-form-field>
-  <mat-form-field class="example-full-width">
-    <textarea matInput placeholder="Add Content" rows="6" [(ngModel)]="enteredContent"></textarea>
-  </mat-form-field>
-  <button mat-raised-button color="primary" (click)="onAddPost()">Save Post</button>
+  <form (submit)="onAddPost(postForm)" #postForm="ngForm">
+      <mat-form-field>
+          <input placeholder="Add Title"
+          matInput
+          type="text"
+          name="title"
+          ngModel
+          required
+          #title="ngModel"
+          >
+          <!--Two ways of getting the value of input title-->
+          <!-- 1.Using Form Control -->
+          <!--<mat-error *ngIf="postForm.getControl('title').invalid">Title Cannot Be Blank</mat-error>-->
+          <!-- 1.Using Reference -->
+          <!--<mat-error *ngIf="title.invalid">Title Cannot Be Blank</mat-error>-->
+          <mat-error *ngIf="title.invalid">Title Cannot Be Blank</mat-error>
+        </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <textarea
+          matInput
+          placeholder="Add Content"
+          rows="6"
+          name="content"
+          ngModel
+          required
+          #content="ngModel"
+          >
+        </textarea>
+        <mat-error *ngIf="content.invalid">Content Cannot Be Blank</mat-error>
+        </mat-form-field>
+        <button
+        mat-raised-button
+        color="primary"
+        type="submit">Save Post</button>
+  </form>
 </mat-card>
