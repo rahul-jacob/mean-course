@@ -13,7 +13,7 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { HeaderComponent } from './header/header.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
 import {MatExpansionModule} from '@angular/material/expansion';
-
+import { PostService } from './posts/post.service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,7 +32,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
     MatToolbarModule,
     MatExpansionModule
   ],
-  providers: [],
+  providers: [PostService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
