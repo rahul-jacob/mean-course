@@ -1,0 +1,4 @@
+Installing express
+------------------
+npm install --save express
+where --save stores an entry in package.json file
