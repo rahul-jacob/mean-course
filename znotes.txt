@@ -2,3 +2,14 @@ Installing express
 ------------------
 npm install --save express
 where --save stores an entry in package.json file
+
+Installing node monitor (nodemon)
+---------------------------------
+npm install --save-dev nodemon
+where --save-dev saves the nodemon in package.json file and only uses this package in development
+mode. Since this package is not installed globally, we need to go to our package.json file and do
+some changes we open package.json and go to script and add
+"start:server":"nodemon server.js"
+the LHS value "start:server" can be any name based on our wish. so to execute the nodemon we need to
+provide the command
+npm run start:server
