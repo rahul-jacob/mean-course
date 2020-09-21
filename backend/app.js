@@ -6,6 +6,32 @@ single special path only. We do this by first creating an express app.
 
 const app = express();
 
+app.use('/api/posts',(req, res, next) => {
+  const posts = [
+    {
+      id : "xyz122A",
+      title : "First Post",
+      content : "This is from the server Post One"
+    },
+    {
+      id : "a3z122A",
+      title : "Second Post",
+      content : "This is from the server Post Two"
+    },
+    {
+      id : "hPo1gRa",
+      title : "Third Post",
+      content : "This is from the server Post Three"
+    }
+  ];
+  res.status(200).json({
+    message: "Data received from the server",
+    posts : posts
+  });
+});
+
+module.exports=app;
+
 /*
 this app can now be used and the import thing about an express app is actually is just a big chain
 of middlewares we apply to incoming requests. So like a funnel through which we sent that express
@@ -14,6 +40,8 @@ thing with that request, manupulate it, read values from it or do something with
 send a response.
 */
 
+/* ##################  Commenting Below Codes --Beg  ########################## */
+/*
 app.use((req,res,next) => {
   console.log('Level 1 Function');
   next();
@@ -28,6 +56,9 @@ app.use((req,res,next) => {
   console.log('Ending Response using send()');
   res.send('Response from server');
 });
+*/
+/* ##################  Commenting Below Codes --End  ########################## */
+
 /*
 So we add such middleware and with the app we use the 'use' keyword this simply uses a new middleware
 on our app and on incoming request. The middleware function the use() function the use function here
@@ -37,7 +68,7 @@ The next function has one important if you execute it in here like this then the
 continue its journey.
 */
 
-module.exports=app;
+//module.exports=app;
 
 /*
 Once this is done we need to wire up this express app with our server here where we are listening to
