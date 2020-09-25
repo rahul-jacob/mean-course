@@ -1,5 +1,8 @@
 import {Post} from './post.model';
 import {Subject} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
 
 /*
     There are two ways to make Angular about our Service.
@@ -17,24 +20,37 @@ import {Subject} from 'rxjs';
     What angualr does is it finds it and it does create only one instance of the service for the
     entire app.
 */
+@Injectable({providedIn : 'root'})
 export class PostService{
 
   private posts : Post[] = [];
   private postUpdated = new Subject<Post[]>();
 
+  constructor(private http: HttpClient) {}
+
   addPost(title: string, content: string){
-    const postObj: Post = {title : title, content : content};
-    this.posts.push(postObj);
-    this.postUpdated.next([...this.posts]);
+    const postObj: Post = {id : null,title : title, content : content};
+    this.http.post<{message: string}>('http://localhost:3000/api/posts',postObj)
+      .subscribe((responseData) =>{
+        console.log(responseData.message);
+        this.posts.push(postObj);
+        this.postUpdated.next([...this.posts]);
+      });
   }
 
   getPostUpdatedListener(){
+    //We are commenting the below code to invoke the node api via httpClient
     return this.postUpdated.asObservable();
+
+    //The angular http client deals with observables so for this won't do anything unless we
+    //listen to it because if you are not accepting then why would it send the request. Now to listen
+    //you need to subscribe and we can pass in 3 arguments one for new data second is for error
+    //and third one is for completion. 5:07
   }
 
   getPost(){
     //return this.posts; //Bad Practice
-    return [...this.posts]; //Good Practice,
+    //return [...this.posts]; //Good Practice,
     /* but wont get the last added item in posts because we get a new array by copying all the
     elements in original post's array so for rectifying this we use Subject from rsjx package.
     This Subject is similar to our EventEmitter the Subject is instantiated and is updated each time
@@ -59,5 +75,32 @@ export class PostService{
       3. And the third argument will be a function that is called when ever the observable is completed
          whenever there is no more values to be expected.
     */
+    /*
+      Filtering or changing the response variable _id to id as in our post.model class we defined
+      as id but in the db its stored as _id. we can simply convert the data we get back from the
+      server before we use it in subscribe, since the htt client of angular uses observables we also
+      get many operators that observables offers. Operators are basically functions, actions that we
+      can apply to the observable streams or to be precise or through the data we get through these
+      streams before the data is ultimately handled in the subscription but still chanined to that
+      observable chain. We use the pipe operator to convert our data. Now pipe simply allows us to add
+      in such an operator and we can actually pipe in multiple operators.
+      Now we need to import Map operator from rxjs/operator. The Map method allows you to transform every
+      element of an array into a new element and store them all back into a new array.
+    */
+   this.http.get<{message:string,posts:any}>('http://localhost:3000/api/posts')
+   .pipe(map((postData) =>{
+      return postData.posts.map(obj => {
+        return {
+          id : obj._id,
+          title : obj.title,
+          content: obj.content
+        };
+      });
+     }))
+   .subscribe((transformedPost) =>{
+     console.log(transformedPost);
+     this.posts = transformedPost;
+     this.postUpdated.next([...this.posts]);
+   });
   }
 }

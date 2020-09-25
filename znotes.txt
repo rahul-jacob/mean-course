@@ -13,3 +13,19 @@ some changes we open package.json and go to script and add
 the LHS value "start:server" can be any name based on our wish. so to execute the nodemon we need to
 provide the command
 npm run start:server
+
+Install httpClientModule for accessing Endpoints
+------------------------------------------------
+Go To app.module.ts file and provide the import
+import {httpClientModule} from '@angular/common/http';
+also provide HttpClientModule in the imports too. so that we can unlock the feature.
+
+Installing body-parser for retrieving data from request
+-------------------------------------------------------
+npm install --save body-parser
+As the name implies it will parse incoming request bodies, extract the request data because that
+will be a stream of data and converting it to just a data object.
+
+Installing mongoose to access Mongo Db
+--------------------------------------
+npm install --save mongoose

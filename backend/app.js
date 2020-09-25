@@ -1,33 +1,78 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const Post = require('./model/post');
 
 /*Now we want to use express, one such way of using it is to add one such route only or handling a
 single special path only. We do this by first creating an express app.
 */
-
 const app = express();
-
-app.use('/api/posts',(req, res, next) => {
-  const posts = [
-    {
-      id : "xyz122A",
-      title : "First Post",
-      content : "This is from the server Post One"
-    },
-    {
-      id : "a3z122A",
-      title : "Second Post",
-      content : "This is from the server Post Two"
-    },
-    {
-      id : "hPo1gRa",
-      title : "Third Post",
-      content : "This is from the server Post Three"
-    }
-  ];
-  res.status(200).json({
-    message: "Data received from the server",
-    posts : posts
+/*
+//Establishing connection with DB using Mongoose
+*/
+mongoose.connect("mongodb+srv://userone:kO2YfautKhIpPfpE@cluster0.dkthb.mongodb.net/test?retryWrites=true&w=majority")
+  .then(()=>{
+    console.log("Connected to Db");
+  })
+  .catch((e)=>{
+    console.log("Error Occured while connection to Db ");
+    console.log(e);
   });
+
+
+app.use(bodyParser.json());//this will return a valid express middleware for parsing JSON data.
+app.use(bodyParser.urlencoded({extended : false}));
+
+/* ########## CORS Origin Fix By Adding Appropriate Headers --Beg ########## */
+app.use((req,res,next) => {
+//The below header Access-Control-Allow-Origin specifies no matter which domain the app which is sending the request is running
+//on it's allowed to access our resources.
+  res.setHeader("Access-Control-Allow-Origin","*");
+
+//This below header "Access-Control-Allow-Header" restricts to the domains sending requests with a certain set of headers besides
+//the default Headers there are default headers like the brower and so on but we also want to allow
+//some extra headers such as "Origin","X-Requested-With","Content-Type","Accept" you can add more or
+//remove some; what these headers essentially mean is the incomming request may have these extra
+//headers. Its not mandatory that a request should have all the default headers if it has it will
+//allowed if it does not have its still allowed. But if the request contains a non-default header
+//i.e header that are not defined here then the access would be blocked.
+  res.setHeader("Access-Control-Allow-Headers","Origin, X-Requested-With, Content-Type, Accept");
+
+ //The below header "Access-Control-Allow-Methods" and here we control the Http Verbs may be used
+ //to send request. Here we want to allow "GET" ,"POST","PATCH" ,"DELETE","OPTIONS"
+ //Now we should be able to sent the request.
+  res.setHeader("Access-Control-Allow-Methods","GET, POST, PATCH, DELETE, OPTIONS");
+  next();
+});
+/* ########## CORS Origin Fix By Adding Appropriate Headers --End ########## */
+
+app.post("/api/posts",(req, res, next) => {
+  //How can we retrieve data attached to a request. for this we install a package body-parser which
+  //help us to retrieve data from the from the request.
+  console.log("Added a post");
+  const post = new Post({
+    title: req.body.title,
+    content: req.body.content
+  });
+  console.log("Adding a post "+post);
+  post.save()
+    .then((postData) => {
+      console.log(postData);
+      res.status(201).json({
+        message : 'Post Added Successfully'
+      });
+    });
+});
+
+app.get('/api/posts',(req, res, next) => {
+  const posts = Post.find({})
+    .then((postList) => {
+      console.log(postList);
+      res.status(200).json({
+        message: "Data received from the server",
+        posts : postList
+      });
+    });
 });
 
 module.exports=app;
