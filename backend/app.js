@@ -46,6 +46,26 @@ app.use((req,res,next) => {
 });
 /* ########## CORS Origin Fix By Adding Appropriate Headers --End ########## */
 
+app.delete("/api/posts/:id",(req, res, next)=>{
+  console.log(1);
+  console.log("The request parameter is "+req.params.id);
+  console.log(2);
+  const deletePost = new Post({
+    _id : req.params.id
+  });
+  console.log("3 printing json request "+deletePost);
+  deletePost.deleteOne(deletePost)
+    .then((result) => {
+      console.log("4 result is "+result);
+      res.status(200).json({
+        message : "Post Deleted with the id " +req.params.id
+      });
+      console.log(6);
+    });
+
+  console.log(7);
+});
+
 app.post("/api/posts",(req, res, next) => {
   //How can we retrieve data attached to a request. for this we install a package body-parser which
   //help us to retrieve data from the from the request.
@@ -59,7 +79,9 @@ app.post("/api/posts",(req, res, next) => {
     .then((postData) => {
       console.log(postData);
       res.status(201).json({
-        message : 'Post Added Successfully'
+        id : postData._id,
+        title : postData.title,
+        content : postData.content
       });
     });
 });

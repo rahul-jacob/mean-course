@@ -28,12 +28,28 @@ export class PostService{
 
   constructor(private http: HttpClient) {}
 
+  deletePost(id : string){
+    console.log("3");
+    this.http.delete("http://localhost:3000/api/posts/"+id)
+      .subscribe((returnData) => {
+        console.log("4");
+        console.log("response from server ",returnData);
+        const modifiedPost = this.posts.filter(obj => obj.id !== id);
+        console.log("Latest updated post ",modifiedPost);
+        this.posts = modifiedPost;
+        this.postUpdated.next([...this.posts]);
+      });
+      console.log("5");
+  }
+
   addPost(title: string, content: string){
     const postObj: Post = {id : null,title : title, content : content};
-    this.http.post<{message: string}>('http://localhost:3000/api/posts',postObj)
+    console.log(22);
+    this.http.post<{id: string, title: string, content: string }>('http://localhost:3000/api/posts',postObj)
       .subscribe((responseData) =>{
-        console.log(responseData.message);
-        this.posts.push(postObj);
+        console.log("33",responseData);
+        console.log("44 ",responseData.id)
+        this.posts.push(responseData);
         this.postUpdated.next([...this.posts]);
       });
   }
