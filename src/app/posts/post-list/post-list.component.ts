@@ -44,16 +44,18 @@ export class PostListComponent implements OnInit, OnDestroy{
   @Input() posts=[];
   postService: PostService;
   postSubb: Subscription;
+  isLoadingFlag: boolean = false;
 
   constructor(postService: PostService){
     this.postService = postService;
   }
 
   ngOnInit(): void {
-    console.log("12345");
+    this.isLoadingFlag = true;
     this.postService.getPost();
     this.postSubb = this.postService.getPostUpdatedListener().subscribe((posts: Post[])=>{
       this.posts = posts;
+      this.isLoadingFlag = false;
     });
   }
   ngOnDestroy(): void {
@@ -63,6 +65,7 @@ export class PostListComponent implements OnInit, OnDestroy{
   onDelete(id : string){
     console.log("1");
     console.log("id is "+id);
+    this.isLoadingFlag = true;
     this.postService.deletePost(id);
     console.log("2");
   }

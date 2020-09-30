@@ -3,6 +3,7 @@ import {Subject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 /*
     There are two ways to make Angular about our Service.
@@ -25,8 +26,31 @@ export class PostService{
 
   private posts : Post[] = [];
   private postUpdated = new Subject<Post[]>();
+  private router: Router;
+  //In order to navigate programatically we use the Router module. this router module has a
+  //method navigate which accepts an array of string router.navigate(["/"])
+  constructor(private http: HttpClient, router: Router) {
+    this.router = router;
+  }
 
-  constructor(private http: HttpClient) {}
+  updatePost(id: string, title: string, content: string){
+    console.log("in update post ",id);
+    const post: Post = {
+      id: id,
+      title: title,
+      content: content
+    }
+    this.http.put("http://localhost:3000/api/posts/"+id, post)
+      .subscribe((returnData)=>{
+        console.log('Update Post response ',returnData);
+        const postList = [...this.posts];
+        const objectIndex = postList.findIndex(obj => obj.id === post.id);
+        postList[objectIndex] = post;
+        this.posts = postList;
+        this.postUpdated.next([...this.posts]);
+        this.router.navigate(["/"]);
+      });
+  }
 
   deletePost(id : string){
     console.log("3");
@@ -38,6 +62,7 @@ export class PostService{
         console.log("Latest updated post ",modifiedPost);
         this.posts = modifiedPost;
         this.postUpdated.next([...this.posts]);
+        this.router.navigate(["/"]);
       });
       console.log("5");
   }
@@ -118,5 +143,9 @@ export class PostService{
      this.posts = transformedPost;
      this.postUpdated.next([...this.posts]);
    });
+  }
+
+  getPostById(postId: string){
+    return this.http.get<{_id:string,title:string,content:string}>("http://localhost:3000/api/posts/"+postId);
   }
 }

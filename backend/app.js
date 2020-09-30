@@ -1,12 +1,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const Post = require('./model/post');
+const postRoutes = require('./routes/posts');
 
 /*Now we want to use express, one such way of using it is to add one such route only or handling a
 single special path only. We do this by first creating an express app.
 */
 const app = express();
+/*
+ With this we have exported the router module. now we need to import it into our app.js so that we can
+ again make our main express app aware of this extra routes because right now all our extra routes
+ would fail.
+ So in the app.js file we need provide the import
+ const postRoutes = require("./routes/posts")
+ Now our router object is imported and all the post related routes are stored in the postRoutes and
+ now to make express aware of it i can simply call
+      app.use(postRoutes);
+*/
+
+
+
+
+
 /*
 //Establishing connection with DB using Mongoose
 */
@@ -41,61 +56,12 @@ app.use((req,res,next) => {
  //The below header "Access-Control-Allow-Methods" and here we control the Http Verbs may be used
  //to send request. Here we want to allow "GET" ,"POST","PATCH" ,"DELETE","OPTIONS"
  //Now we should be able to sent the request.
-  res.setHeader("Access-Control-Allow-Methods","GET, POST, PATCH, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods","GET, POST, PATCH, DELETE, OPTIONS, PUT");
   next();
 });
 /* ########## CORS Origin Fix By Adding Appropriate Headers --End ########## */
 
-app.delete("/api/posts/:id",(req, res, next)=>{
-  console.log(1);
-  console.log("The request parameter is "+req.params.id);
-  console.log(2);
-  const deletePost = new Post({
-    _id : req.params.id
-  });
-  console.log("3 printing json request "+deletePost);
-  deletePost.deleteOne(deletePost)
-    .then((result) => {
-      console.log("4 result is "+result);
-      res.status(200).json({
-        message : "Post Deleted with the id " +req.params.id
-      });
-      console.log(6);
-    });
-
-  console.log(7);
-});
-
-app.post("/api/posts",(req, res, next) => {
-  //How can we retrieve data attached to a request. for this we install a package body-parser which
-  //help us to retrieve data from the from the request.
-  console.log("Added a post");
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content
-  });
-  console.log("Adding a post "+post);
-  post.save()
-    .then((postData) => {
-      console.log(postData);
-      res.status(201).json({
-        id : postData._id,
-        title : postData.title,
-        content : postData.content
-      });
-    });
-});
-
-app.get('/api/posts',(req, res, next) => {
-  const posts = Post.find({})
-    .then((postList) => {
-      console.log(postList);
-      res.status(200).json({
-        message: "Data received from the server",
-        posts : postList
-      });
-    });
-});
+app.use("/api/posts",postRoutes);
 
 module.exports=app;
 

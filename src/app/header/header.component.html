@@ -1,5 +1,17 @@
 <p>
   <mat-toolbar color="primary">
-    <span>My Messages</span>
+    <span><a routerLink="/">My Messages</a></span>
+    <span class="spacer"></span>
+    <ul>
+      <li><a mat-button routerLink="/create" routerLinkActive="mat-accent">New Post</a></li>
+    </ul>
   </mat-toolbar>
 </p>
+<!--
+  Now we create the links in an unordered list where every element has an anchor tag, but here instead
+  of html anchor tag we are using angular's route link routerLink directive. Now this is used by angualr to turn
+  this into normal link and capture by the angular router so that it can actually well stop the
+  behiviour of sending an http request and actually rerendering the page for which we have link to
+  create post screen.
+
+-->
