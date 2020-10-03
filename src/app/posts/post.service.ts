@@ -76,6 +76,7 @@ export class PostService{
         console.log("44 ",responseData.id)
         this.posts.push(responseData);
         this.postUpdated.next([...this.posts]);
+        this.router.navigate(["/"]);
       });
   }
 

@@ -1,34 +1,58 @@
 <mat-card>
   <mat-spinner *ngIf="isLoadingFlag"></mat-spinner>
-  <form (submit)="onSavePost(postForm)" #postForm="ngForm" *ngIf="!isLoadingFlag">
+  <!--
+    Now we are going to connect or synchronize the template and our typescript. So we tell angular which
+    input in the html file relates to which control where created in typescript because you could argue
+    that the title control should obviously be that input because it has the name title, but angular
+    does not infer this it gives you the flexibality of defining no name (name=title) here, you can now
+    remove that or a different name so instead of relying on the name attribute what you do instead is
+    you add a special directive here before that first of all you add a directive to your averall form,
+    the formGroup directive, this formGroup directive takes your form object defined in typescript. It
+    takes this and basically tells angualr hey for the form i created in typescript this is the html.
+    And here on the input i can use a different directive formControlName and type the name of the
+    control as we defined it in typescript. So now we connectet our input to our form control.
+   -->
+  <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoadingFlag">
       <mat-form-field>
           <input placeholder="Add Title"
           matInput
           type="text"
-          name="title"
-          [ngModel]="postObj?.title"
-          required
-          #title="ngModel"
-          >
+          formControlName="title">
           <!--Two ways of getting the value of input title-->
           <!-- 1.Using Form Control -->
           <!--<mat-error *ngIf="postForm.getControl('title').invalid">Title Cannot Be Blank</mat-error>-->
-          <!-- 1.Using Reference -->
+          <!-- 2.Using Reference -->
           <!--<mat-error *ngIf="title.invalid">Title Cannot Be Blank</mat-error>-->
-          <mat-error *ngIf="title.invalid">Title Cannot Be Blank</mat-error>
+
+          <!-- when using reactive declerative style of programming in order to access the title form
+          control and we do this by accessing the overrall form and there you have a get() method which
+          gives you access to a control where you pass the control name as title
+              form.get('title')
+          -->
+        <!--<mat-error *ngIf="title.invalid">Title Cannot Be Blank</mat-error>-->
+
+        <mat-error *ngIf="form.get('title').invalid">Title Cannot Be Blank</mat-error>
+        <!-- The above statemet didn't work so modifed to the below one -->
+        <!-- <mat-error *ngIf="form.get('title').value.invalid">Title Cannot Be Blank</mat-error> -->
         </mat-form-field>
+
+<!-- We have proxy the material button with file type input. So on angular button click it
+      behaves like input type file this is called proxying. Once its done next step is to register
+    this input type file component as an input to our form component. -->
+        <!--<div>
+          <button mat-stroked-button type="button" (click)="filePicker.click()">Image</button>
+          <input type="file" #filePicker>
+        </div>-->
         <mat-form-field class="example-full-width">
           <textarea
           matInput
           placeholder="Add Content"
           rows="6"
-          name="content"
-          [ngModel]="postObj?.content"
-          required
-          #content="ngModel"
+          formControlName="content"
           >
+        <!-- Shortcut syntax is provided above instead of [formControlName]="'content'" -->
         </textarea>
-        <mat-error *ngIf="content.invalid">Content Cannot Be Blank</mat-error>
+        <mat-error *ngIf="form.get('content').invalid">Content Cannot Be Blank</mat-error>
         </mat-form-field>
         <button
         mat-raised-button
