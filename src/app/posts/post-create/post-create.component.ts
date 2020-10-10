@@ -19,6 +19,7 @@ export class PostCreateComponent implements OnInit{
   private postId: string;
   public postObj: Post;
   public isLoadingFlag: boolean = false;
+  public imagePreview: string[];
   /*
   Form Group is the top level of Form. It groups all the controls of a form. We can also have
   sub-groups in a form if you want to well then group controls with in a form but the form overrall
@@ -69,6 +70,9 @@ export class PostCreateComponent implements OnInit{
       }),
       'content': new FormControl(null,{
         validators: [Validators.required]
+      }),
+      'image': new FormControl(null,{
+        validators: [Validators.required]
       })
     });
     /*
@@ -93,7 +97,7 @@ export class PostCreateComponent implements OnInit{
     the formGroup directive, this formGroup directive takes your form object defined in typescript. It
     takes this and basically tells angualr hey for the form i created in typescript this is the html.
     And here on the input i can use a different directive formControlName and type the name of the
-    control as we defined it in typescript. So now we connectet our input to our form control.
+    control as we defined it in typescript. So now we connect our input to our form control.
     */
     this.route.paramMap.subscribe((param: ParamMap) => {
       if(param.has('postId')){
@@ -145,5 +149,55 @@ export class PostCreateComponent implements OnInit{
     }
     this.form.reset();
     console.log("In post added method PostAdded! End");
+  }
+  //Event is defined in default package, so now we want to access the files that were added.
+  onImagePicked(event: Event){
+    const file = (event.target as HTMLInputElement).files[0];
+    /*I create a new constant file, and i can access this by accessing event target which is the, well
+    target on which we clicked and then the file's property i.e file. The problem just is Typescript
+    doesn't know that our event target actually is an input file and therefore it doesn't know that
+    this file's property exists. event.target.file so we can solve this or by explicit telling
+    typescript that this will be of type HTML input element. For that we can simply wrap event target
+    with parenthesis and then add as HTMLInputElement so its now type casted or type conversion and it
+    clearly tells typescript that this entire expression here will be an HTML input element which
+    happens to have a files property.
+    The files is an array of files but we that the first element from the array. Now the next step is
+    to store this in the form control so we add a new control.
+    'image': new FormControl(null,{validators: [Validators.required]})
+    Now one thing that we do here is we won't bind this to any HTML element, we won't be binding it to
+    the file picker because we dohen't want to display anything there and also don't want to display an
+    error message so i would not synchronize this to HTML and this is the cool thing of reactive progr
+    amming approach. We don't have to synchronize this instead we can totally manage a value behind the
+    scenes in typescript only. i.e now we can access the value once the screen is submitted for that we
+    need not bind the controller to an HTML element.
+    So now that i can refer to the value by reaching out to my form because its controlled in typescript
+    and then i can call patchValue() Now setValue() is something we saw and we could set the value of
+    the complete inputs in the control of our form. But patchValue() allows you to target a single
+    control and that's excately i want to do here, the patchValue(controlName)
+        this.form.patchValue({
+          'image': file
+        });
+     where the file is the file Object in Javascript.
+     Once this is done i need to access the formControl image and call updateValueAndValidity(). This
+     basically informs Angular that i changed the value and it should re-validate that store that value
+     internally and also check the value i did patch is valid and that will run the validator even thought
+     the user never directly typed in there.
+    */
+   this.form.patchValue({image: file});
+   this.form.updateValueAndValidity();
+   console.log(file);
+   console.log(this.form);
+   //Now we need to convert the image to a so called Data URL that can be used as the normal image tag. For that we will
+  //add a new property called imagePreview which is of type string. Then we we will populate this with the derived URL.Now
+  //to create the url we would have to use a feature used by java script which is called a FileReader. We will create an\
+  //instance of FileReader.
+  const reader = new FileReader();
+  reader.onload = () =>{
+    this.imagePreview = reader.result;
+  };
+  reader.readAsDataURL(file);
+
+
+
   }
 }

@@ -25,7 +25,8 @@ const app = express();
 /*
 //Establishing connection with DB using Mongoose
 */
-mongoose.connect("mongodb+srv://userone:kO2YfautKhIpPfpE@cluster0.dkthb.mongodb.net/test?retryWrites=true&w=majority")
+//mongoose.connect("mongodb+srv://userone:kO2YfautKhIpPfpE@cluster0.dkthb.mongodb.net/test?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://dap_user:dap_password@cluster0.er3a3.mongodb.net/dap?retryWrites=true&w=majority")
   .then(()=>{
     console.log("Connected to Db");
   })
