@@ -1,0 +1,126 @@
+Objects.requireNonNull(other)
+https://javarevisited.blogspot.com/2016/04/10-examples-of-converting-list-to-map.html
+TCS Internal
+java -Xms256s HelloWorld (Initial Heap Size)
+java -Xmx256m HelloWorld (Maximum Heap Size)
+java -Xmn256n HelloWorld (Heap Size for young generation objects / New Objects)
+--------------------------------------------------------------------------
+1.Map Iteration User forEach
+--------------------------------------------------------------------------
+Map<String, String> map = new HashMap<String, String>();
+map.forEach( (key, value) -> { 
+	System.out.println( "Key: " + key + "\t" + " Value: " + value ); 
+});
+--------------------------------------------------------------------------
+2.Sorting using Comparator
+--------------------------------------------------------------------------
+System.out.println("-------- sorting by name");
+	developers.sort((d1,d2) ->	d1.getName().compareTo(d2.getName()));
+	developers.forEach(System.out::println);
+--------------------------------------------------------------------------	
+3.Filtering List elements based on a condition and storing the filtered
+elements into another list
+--------------------------------------------------------------------------
+List<Developer> filteredDevList = devList.stream()
+				.filter(devObj -> devObj.getSalary() > 100000)
+				.collect(Collectors.toList());
+-------------------------------------------------------------------------
+4 Filtering List of elements based on condition and processing the filtered
+list and storing it to another list.
+--------------------------------------------------------------------------
+List<String> list = devList.stream()
+				.filter(dev -> dev.getSalary() > 50000)
+				//.map(obj -> obj.getName())
+				.map(Developer::getName)
+				.sorted()
+				.collect(Collectors.toList());
+list.forEach(System.out::println);
+--------------------------------------------------------------------------
+List<Integer> transactionsIds = 
+    transactions.stream()
+                .filter(t -> t.getType() == Transaction.GROCERY)
+                .sorted(comparing(Transaction::getValue).reversed())
+                .map(Transaction::getId)
+                .collect(toList());
+--------------------------------------------------------------------------
+https://www.oracle.com/technetwork/articles/java/ma14-java-se-8-streams-2177646.html				
+--------------------------------------------------------------------------
+List<String> list = Arrays.asList(getScopeCode(), getScopeName(), getEquipmentNo());
+	return list.stream().map(x -> x != null ? x.trim() : "").filter(StringUtils::isNotBlank).collect(Collectors.joining(" - "));
+	
+---------------------------------	
+Finding Unique Values From a List
+---------------------------------
+List<Integer> integerList = Arrays.asList(1,2,3,4,5,5,5,6,4,7,8,9,10,8,9,10);
+List<Integer> listOut = integerList.stream().distinct().collect(Collectors.toList());
+System.out.println(listOut);
+
+
+Processing
+----------
+publicationList = publicationList.stream().filter(pub -> StringUtils.isNotBlank(pub.getActivityNumber()))
+	.sorted(Comparator.comparing(PrintVolumePublicationDto::getPublicationNumber, Comparator.nullsFirst(Comparator.naturalOrder()))
+	.thenComparing(PrintVolumePublicationDto::getRevision, Comparator.nullsFirst(Comparator.naturalOrder()))).collect(Collectors.toList());
+		
+Problem.
+--------
+If you want to iterate over a list and create a new list with "transformed" objects, you should use the map() function of stream + collect().
+Approach-1
+In the following example I find all people with the last name "l1" and each person I'm "mapping" to a new Employee instance.
+List<Employee> employees = persons.stream()
+                .filter(p -> p.getLastName().equals("l1"))
+                .map(p -> new Employee(p.getName(), p.getLastName(), 1000))
+                .collect(Collectors.toList());
+
+Approach-2
+List<FmiPrintVolumeDto> fmiPrintVolumeDtoList = getPublishedFmiPublications(ipsNo, languageCode, selectedFmi);
+List<PrintVolumePublicationDto> publicationList = fmiPrintVolumeDtoList.stream()
+		.filter(dto -> null != dto.getPageCount() && dto.getPageCount() > Long.valueOf(0))
+		.map(this :: mapFromFmiPrintVolumeDtoToPrintVolumePublicationDto).collect(Collectors.toList());
+private PrintVolumePublicationDto mapFromFmiPrintVolumeDtoToPrintVolumePublicationDto(FmiPrintVolumeDto fmiPVDto) {
+	PrintVolumePublicationDto dto = new PrintVolumePublicationDto();
+	dto.setActivityNumber(fmiPVDto.getActivityNo());
+	dto.setPublicationNumber(fmiPVDto.getPublicationNo());
+	dto.setRevision(fmiPVDto.getRevision());
+	dto.setDisplayName(fmiPVDto.getDisplayName());
+	dto.setBucketType(fmiPVDto.getBucketType());
+	dto.setPageSizeType(fmiPVDto.getPageSize());
+	dto.setPageCount(fmiPVDto.getPhysicalPages());
+	dto.setPlmFileSize(fmiPVDto.getPlmSheetSize());
+	dto.setNodeId(fmiPVDto.getNodeId());
+	dto.setSource(fmiPVDto.getSource());
+	return dto;
+}
+
+Group By -> Filters by Category and Architecture
+------------------------------------------------
+List<Long> fmiIdList = fmiUnitList.stream().map(FmiUnitData::getId).collect(Collectors.toList());
+List<FmiArchitecture> fmiMliList = fmiArchDao.findByFmiIdListAndIpsNoAndLanguageCodeAndOmmActive(ipsNo, languageCode, fmiIdList);
+LOG.info("fmiMliList size :: {}" ,fmiMliList.size());
+if(CollectionUtils.isNotEmpty(fmiMliList)) {
+	LinkedHashMap<String, List<FmiArchitecture>> fmiMliGroupedByActivityCategory = fmiMliList.stream().filter(f -> null != f && null != f.getFmi() && StringUtils.isNotBlank(f.getFmi().getActivityCat()))
+			.collect(Collectors.groupingBy(f -> f.getFmi().getActivityCat(), LinkedHashMap::new, Collectors.toList()));
+}
+
+
+Filtering Unique Values based on a property
+-------------------------------------------
+I am trying to remove duplicates from a List of objects based on some property. can we do it in a simple way using java 8
+
+List<Employee> employee
+
+Can we remove duplicates from it based on id property of employee. I have seen posts removing duplicate strings form arraylist of string using distinct() of stream.
+
+Solution
+You can get a stream from the List and put in in the TreeSet from which you provide a custom comparator that compares id uniquely.
+Then if you really need a list you can put then back this collection into an ArrayList
+
+List<Employee> unique = employee.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Employee::getName))),
+                                           ArrayList::new));
+			
+Given the example:
+List<Employee> employee = Arrays.asList(new Employee(1, "John"), new Employee(1, "Bob"), new Employee(2, "Alice"));
+
+the output
+[Employee{id=1, name='John'}, Employee{id=2, name='Alice'}]			
